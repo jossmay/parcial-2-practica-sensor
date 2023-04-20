@@ -1,0 +1,98 @@
+const int echoPin = 11;     // Pin del echo
+const int triggerPin = 10;  // Pin del trigger
+const int ledAlerta = 9;    // Pin del led de alerta
+const int buzzer = 8;       // Pin del buzzer
+
+double distance = 0;  // variable para la distancia
+
+//Potenciometro:
+const int ledRoja = 3;        
+const int ledAmarilla = 5;    
+const int ledVerde = 6;       
+const int potenciometro = 0;  
+int brillo;                   
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(triggerPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledAlerta, OUTPUT);
+  pinMode(ledRoja, OUTPUT);
+  pinMode(ledAmarilla, OUTPUT);
+  pinMode(ledVerde, OUTPUT);
+}
+
+void loop() {
+  leds();
+  distance = medirDistancia();
+  if (distance <= 20) {
+    alerta(ledAlerta);
+    sonidoBuzz(buzzer);
+    Serial.print("Distancia = ");
+    Serial.print(distance);
+    Serial.println(" cm");
+    delay(500);
+  } else {
+    sonidoBuzzApagar(buzzer);
+  }
+}
+
+void alerta(int led) {
+  digitalWrite(led, HIGH);
+  delay(200);
+  digitalWrite(led, LOW);
+  delay(200);
+  digitalWrite(led, HIGH);
+  delay(200);
+  digitalWrite(led, LOW);
+  delay(200);
+  digitalWrite(led, HIGH);
+  delay(200);
+  digitalWrite(led, LOW);
+  delay(200);
+  digitalWrite(led, HIGH);
+  delay(200);
+  digitalWrite(led, LOW);
+  delay(200);
+  digitalWrite(led, HIGH);
+  delay(200);
+  digitalWrite(led, LOW);
+  delay(200);
+}
+
+// Función para medir la distancia.
+double medirDistancia() {
+  double distancia = 0;
+  double duracion = 0;
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(4);
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
+
+  // Medir el tiempo en ms.
+  duracion = pulseIn(echoPin, HIGH) / 2;
+
+  // Distancia a cm.
+  distancia = duracion / 29.2;
+  return distancia;
+}
+
+// Función para activar el sonido en el buzzer.
+void sonidoBuzz(int buzzer) {
+  tone(buzzer, 1500);
+  delay(500);
+}
+
+// Función para apagar el sonido en el buzzer.
+void sonidoBuzzApagar(int buzzer) {
+  noTone(buzzer);
+}
+
+// Función para cambiar la intensidad de los LEDS con el potenciómetro.
+void leds() {
+  brillo = analogRead(potenciometro) / 4;
+  analogWrite(ledRoja, brillo);
+  analogWrite(ledAmarilla, brillo);
+  analogWrite(ledVerde, brillo);
+}
